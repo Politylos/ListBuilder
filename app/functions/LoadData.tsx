@@ -452,7 +452,11 @@ export async function GetunitStats(unit : string, data : any){
     var unitProf =  await GetUnitProf(unitData);
     var unitsectionGroups =  await GetUnitsectionGroups(unitData);
     var unitentriers=  await GetUnitsectionEntries(unitData);
-    var unitjson :  jsonDict<any> = {"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null};
+    var unitjson :  jsonDict<any> = {"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0};
+    var unitcost : jsonDict<any> = await GetUnitcosts(unitData);
+    if (unitcost != null){
+      unitjson["Cost"] = parseInt(unitcost[IDict["Cost"]]["value"]);
+    }
     if (unitProf != null){
       for (const profkey of Object.keys(unitProf)){
         if (unitProf[profkey]["typeName"]=="Unit"){
@@ -516,6 +520,7 @@ export async function Startup(){
   await ReadW40Index();
   await DownloadAllIndex("w40k_10e.json");
   var unitcosts = await GetAllUnitCosts("ImperiumAdeptusMechanicus.cat");
+  console.log(unitcosts)
   var battleunits = await SelectUnitsfromType("Battleline",unitcosts)
   console.log(battleunits);
   var Filedata = await PraseCat("ImperiumAdeptusMechanicus.cat");
