@@ -500,7 +500,7 @@ export async function GetunitStats(unit : string, data : any){
   console.log(unitjson);
   return unitjson;
   }
-  return null;
+  return {};
 
 }
 
