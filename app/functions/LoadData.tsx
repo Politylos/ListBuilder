@@ -1,27 +1,10 @@
 import * as FileSystem from 'expo-file-system';
 import React, { useState, useEffect } from 'react';
 var DOMParser = require('xmldom').DOMParser;
-import { jsonDict } from "@/app/functions/Structs";
+import { jsonDict, IDict } from "@/app/functions/Structs";
 
 
-const IDict : jsonDict<string> = {
-  "Movement": "e703-ecb6-5ce7-aec1",
-  "Toughness": "d29d-cf75-fc2d-34a4",
-  "Save": "450-a17e-9d5e-29da",
-  "Wounds": "750a-a2ec-90d3-21fe",
-  "Leadership":"58d2-b879-49c7-43bc",
-  "OC":"bef7-942a-1a23-59f8",
-  "Range":"914c-b413-91e3-a132",
-  "Attacks":"2337-daa1-6682-b110",
-  "WS":"95d1-95f-45b4-11d6",
-  "Strength":"ab33-d393-96ce-ccba",
-  "AP":"41a0-1301-112a-e2f2",
-  "Damage":"3254-9fe6-d824-513e",
-  "Keywords":"893f-9000-ccf7-648e",
-  "Cost":"51b2-306e-1021-d207",
-  "Description":"9b8f-694b-e5e-b573"
 
-}
 
 
 
@@ -30,11 +13,11 @@ function loadfaction(){
     var data = ""//require(file);
     return data
 }
-const MainDir = FileSystem.cacheDirectory + 'ListBuilder/';
-const GetFileUri = (fileID: string) => MainDir + `${fileID.replace(" - ","").replace(" ","")}`;
+export const MainDir = FileSystem.cacheDirectory + 'ListBuilder/';
+export const GetFileUri = (fileID: string) => MainDir + `${fileID.replace(" - ","").replace(" ","")}`;
 
-// Checks if gif directory exists. If not, creates it
-async function CheckDir() {
+
+export async function CheckDir() {
   const dirInfo = await FileSystem.getInfoAsync(MainDir);
   if (!dirInfo.exists) {
     await FileSystem.makeDirectoryAsync(MainDir, { intermediates: true });
@@ -56,7 +39,7 @@ export async function DownloadIndex(fileName: string,url: string) {
     return fileUri;
 }
 
-export async function GEtW40Index(){
+export async function GetW40Index(){
   return DownloadIndex("w40k_10e.json","http://10.0.0.144:4444/wh40k_feed")
 }
 
@@ -516,7 +499,7 @@ export async function SelectUnitsfromType(type : string, data : jsonDict<any>){
 
 
 export async function Startup(){
-  await GEtW40Index();
+  await GetW40Index();
   await ReadW40Index();
   await DownloadAllIndex("w40k_10e.json");
   var unitcosts = await GetAllUnitCosts("ImperiumAdeptusMechanicus.cat");
