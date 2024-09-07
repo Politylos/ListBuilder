@@ -431,11 +431,25 @@ export async function GetAllUnitCosts(catFile : string){
 }
 export async function GetunitStats(unit : string, data : any){
   var unitData = await GetUnitData(unit,data);
+  let mainID = null;
   if (unitData != null){
+    if (unitData != null){
+      if (unitData.hasOwnProperty("attributes")){
+        if (Object.keys(unitData.attributes).length > 0){
+          for (const unitkey of Object.keys(unitData.attributes)){
+            if (unitData.attributes[unitkey].hasOwnProperty("nodeName")){
+              if (unitData.attributes[unitkey]["nodeName"] == "id"){
+                mainID = unitData.attributes[unitkey]["nodeValue"];
+              }
+            }
+          }
+        }
+      }
+    }
     var unitProf =  await GetUnitProf(unitData);
     var unitsectionGroups =  await GetUnitsectionGroups(unitData);
     var unitentriers=  await GetUnitsectionEntries(unitData);
-    var unitjson :  jsonDict<any> = {"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0};
+    var unitjson :  jsonDict<any> = {"ID":mainID,"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0};
     var unitcost : jsonDict<any> = await GetUnitcosts(unitData);
     if (unitcost != null){
       unitjson["Cost"] = parseInt(unitcost[IDict["Cost"]]["value"]);
@@ -474,13 +488,11 @@ export async function GetunitStats(unit : string, data : any){
           unitjson["Weapons"][sectionkey] = unitsectionGroups[sectionkey];
         }
       }
-      console.log(unitsectionGroups)
 
     }
     if (unitentriers != null){
       unitjson["Units"] = unitentriers;
     }
-  console.log(unitjson);
   return unitjson;
   }
   return {};
