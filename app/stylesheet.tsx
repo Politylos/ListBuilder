@@ -1,6 +1,47 @@
 import { StyleSheet, Text, View } from "react-native";
 
 export const globalStyles = StyleSheet.create({
+	rootEmptyCard: {
+		height: 81,
+		paddingTop: 5,
+		paddingLeft: 5,
+		paddingBottom: 5,
+		paddingRight: 5,
+		flexDirection: 'column',
+		justifyContent: 'center',
+		alignItems: 'center',
+		rowGap: 5,
+		columnGap: 5,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderWidth: 2,
+		borderStyle: 'dashed',
+		borderColor: 'Placeholder.Grey',
+	  },
+	  plusEmptyCard: {
+		color: 'rgba(0, 0, 0, 1)',
+		textAlign: 'center',
+		fontFamily: 'Font Awesome 6 Pro',
+		fontSize: 14,
+		fontStyle: 'normal',
+		fontWeight: '900',
+	  },
+	  addAUnitEmptyCard: {
+		color: 'rgba(0, 0, 0, 1)',
+		textAlign: 'center',
+		fontSize: 14,
+		fontStyle: 'normal',
+		fontWeight: '700',
+	  },
+	  frame42EmptyCard: {
+		flexDirection: 'column',
+		justifyContent: 'flex-end',
+		alignItems: 'center',
+		rowGap: 5,
+		columnGap: 5,
+	  },
 	dashboardScrollViewParent: {
 		width: '100%',
 		paddingHorizontal: 20

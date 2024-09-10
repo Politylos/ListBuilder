@@ -2,6 +2,14 @@ export interface jsonDict<TValue> {
     [id: string]: TValue;
   }
 
+export const getCurrentDate=()=>{
+ 
+    var date = new Date().getDate();
+    var month = new Date().getMonth() + 1;
+    var year = new Date().getFullYear();
+    return date + '-' + month + '-' + year;//format: d-m-y;
+}
+
 export const IDict : jsonDict<string> = {
     "Movement": "e703-ecb6-5ce7-aec1",
     "Toughness": "d29d-cf75-fc2d-34a4",

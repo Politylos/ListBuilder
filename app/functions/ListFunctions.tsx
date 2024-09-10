@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import React, { useState, useEffect } from 'react';
 var DOMParser = require('xmldom').DOMParser;
-import { jsonDict } from "@/app/functions/Structs";
+import { jsonDict ,getCurrentDate } from "@/app/functions/Structs";
 import { MainDir} from "@/app/functions/LoadData";
 
 const ListDir = MainDir + "List/"
@@ -22,6 +22,7 @@ export async function CreateFactionList(catfile : string, faction : string, name
     listData["Size"]= Listsize;
     listData["Units"]= {};
     listData["Cost"]= 0;
+    listData["Date"] = getCurrentDate();
     console.log(listData["Cost"])
     console.log(listData);
     let created = await SaveList(listData,true);
@@ -63,10 +64,45 @@ export async function DeleteList(List : jsonDict<any>){
     return false;
     
 }
+export async function NewestLists(){
+    let AllLists : any = await loadLists();
+    console.log("HILLL")
+    console.log(Object.keys(AllLists))
+    let TopLists : any = [null, null, null,null,null,null, null, null,null,null];
+    for (const att of Object.keys(AllLists)){
+        let CurrentMove = AllLists[att];
+        console.log(CurrentMove)
+        for (let i = 0;  i < 10;i++){
+            console.log(TopLists[i])
+            if (TopLists[i]==null){
+                console.log("Data")
+                let Store = TopLists[i];
+                TopLists[i] = CurrentMove;
+                CurrentMove = Store;
+            } else{
+                if (new Date(TopLists[i]["Date"]) < new Date(CurrentMove["Date"])){
+                    let Store = TopLists[i];
+                    TopLists[i] = CurrentMove;
+                    CurrentMove = Store;
+                }
+            }
+        }
+    }
+    let TopListsReturn : any = []
+    for (let i = 0;  i < 10;i++){
+        if (TopLists[i]==null){
+
+        } else{
+            TopListsReturn.push(TopLists[i])
+        }
+    }
+    return TopListsReturn;
+}
 
 export async function SaveList(List : jsonDict<any>,check : Boolean = false){
-    if ((List.hasOwnProperty("Units") && List.hasOwnProperty("Cost") && List.hasOwnProperty("Faction") && List.hasOwnProperty("CatFile") && List.hasOwnProperty("name") && List.hasOwnProperty("Size") )){
+    if ((List.hasOwnProperty("Date") && List.hasOwnProperty("Units") && List.hasOwnProperty("Cost") && List.hasOwnProperty("Faction") && List.hasOwnProperty("CatFile") && List.hasOwnProperty("name") && List.hasOwnProperty("Size") )){
         await CheckDir();
+        List["Date"] = getCurrentDate();
         const fileUri = GetFileUri(List["name"]);
         console.log(fileUri)
         const fileInfo = await FileSystem.getInfoAsync(fileUri);
