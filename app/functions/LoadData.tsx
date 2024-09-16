@@ -45,9 +45,9 @@ export async function GetW40Index(){
 
 export async function ReadSystemData(file : string){
   const fileUri = GetFileUri(file);
+  console.log(fileUri)
   const data = await FileSystem.readAsStringAsync(fileUri);
-  console.log("Got saved file")
-  console.log(data);
+
   return data;
 }
 
@@ -58,7 +58,13 @@ export async function ReadW40Index(){
 export async function GetFactionDownload(url : string,faction : string){
   return await DownloadIndex(faction, url);
 }
-
+export async function GetSystemFactions(system_file : string){
+  console.log("AA")
+  console.log(system_file)
+  const sys_data : any = JSON.parse(await ReadSystemData(system_file));
+  console.log(sys_data)
+  return sys_data["Files"];
+}
 export async function DownloadAllIndex(system_file : string){
   const sys_data : any = JSON.parse(await ReadSystemData(system_file));
   console.log("Downloading all");
@@ -403,7 +409,7 @@ export async function GetAllUnitCosts(catFile : string){
             if (unitmod != null){
             JsdonUnits[AllUnits[ID]["name"]] = {"ID":AllUnits[ID]["id"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":unitmod[0]["value"], "Type": "None"};
             } else{
-              JsdonUnits[AllUnits[ID]["name"]] = {"ID":AllUnits[ID]["id"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":'1',"Type":"None"};
+              JsdonUnits[AllUnits[ID]["name"]] = {"Name":AllUnits[ID]["name"],"ID":AllUnits[ID]["id"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":'1',"Type":"None"};
             }
             if (unitCats != null){
               var toptype = false;
@@ -430,7 +436,9 @@ export async function GetAllUnitCosts(catFile : string){
   //await GetUnitcosts(data);
 }
 export async function GetunitStats(unit : string, data : any){
+  console.log(unit, data)
   var unitData = await GetUnitData(unit,data);
+  var unitCats : jsonDict<any> = await GetUnitcat(unitData);
   let mainID = null;
   if (unitData != null){
     if (unitData != null){
@@ -449,8 +457,25 @@ export async function GetunitStats(unit : string, data : any){
     var unitProf =  await GetUnitProf(unitData);
     var unitsectionGroups =  await GetUnitsectionGroups(unitData);
     var unitentriers=  await GetUnitsectionEntries(unitData);
-    var unitjson :  jsonDict<any> = {"ID":mainID,"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0};
+    var unitjson :  jsonDict<any> = {"ID":mainID,"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0, "Type":null};
     var unitcost : jsonDict<any> = await GetUnitcosts(unitData);
+    if (unitCats != null){
+      if (Object.keys(unitCats).length > 0){
+        var toptype = false;
+        for (const Catkey of Object.keys(unitCats)){
+          if (!toptype){
+            if ((unitCats[Catkey]["name"] == "Vehicle") || (unitCats[Catkey]["name"] == "Battleline") || (unitCats[Catkey]["name"] == "Infantry") || (unitCats[Catkey]["name"] == "Mounted") || (unitCats[Catkey]["name"] == "Fortification") || (unitCats[Catkey]["name"] == "Monster") || (unitCats[Catkey]["name"] == "Swarm") || (unitCats[Catkey]["name"] == "Character") || (unitCats[Catkey]["name"] == "Epic Hero") || (unitCats[Catkey]["name"] == "Dedicated Transport")){
+              unitjson["Type"] = unitCats[Catkey]["name"]
+              if ((unitCats[Catkey]["name"] == "Battleline") || (unitCats[Catkey]["name"] == "Epic Hero")){
+                toptype = true;
+              }
+            }
+          }
+        }
+        unitjson["Type"]
+      }
+      
+    }
     if (unitcost != null){
       unitjson["Cost"] = parseInt(unitcost[IDict["Cost"]]["value"]);
     }
@@ -493,8 +518,10 @@ export async function GetunitStats(unit : string, data : any){
     if (unitentriers != null){
       unitjson["Units"] = unitentriers;
     }
+    console.log(unitjson)
   return unitjson;
   }
+  console.log("Bad")
   return {};
 
 }

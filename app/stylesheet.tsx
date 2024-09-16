@@ -1,6 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 
 export const globalStyles = StyleSheet.create({
+	TextInput: {
+			height: 40,
+			margin: 12,
+			borderWidth: 1,
+			padding: 10,
+	},
 	rootEmptyCard: {
 		height: 81,
 		paddingTop: 5,
@@ -23,7 +29,6 @@ export const globalStyles = StyleSheet.create({
 	  plusEmptyCard: {
 		color: 'rgba(0, 0, 0, 1)',
 		textAlign: 'center',
-		fontFamily: 'Font Awesome 6 Pro',
 		fontSize: 14,
 		fontStyle: 'normal',
 		fontWeight: '900',

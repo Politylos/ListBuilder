@@ -33,6 +33,15 @@ export async function CreateFactionList(catfile : string, faction : string, name
     return {};
 }
 
+export async function LoadList(name : string){
+    let fileUri = GetFileUri(name);
+    let List = JSON.parse(await FileSystem.readAsStringAsync(fileUri));
+    if ((List.hasOwnProperty("Units") && List.hasOwnProperty("Cost") && List.hasOwnProperty("Faction") && List.hasOwnProperty("CatFile") && List.hasOwnProperty("name") && List.hasOwnProperty("Size") )){
+    return List;
+    }
+    return {};
+}
+
 export async function loadLists(){
     var listFiles = await FileSystem.readDirectoryAsync(ListDir);
     var Lists : jsonDict<any> = {}
@@ -263,8 +272,9 @@ export async function ChangeWeapon(List : jsonDict<any>, key: number, NewWeapon 
 }
 
 export async function AddUnitToList(List : jsonDict<any>, unit : jsonDict<any>){
-    console.log("Passed")
+    
     if ((List.hasOwnProperty("Units")) && (List.hasOwnProperty("Cost"))){
+        
         List["Cost"] += parseInt(unit["Cost"]);
         var Nextkey = 0;
         if (Object.keys(List["Units"]).length > 0){
@@ -273,6 +283,7 @@ export async function AddUnitToList(List : jsonDict<any>, unit : jsonDict<any>){
             Nextkey = parseInt(Object.keys(List["Units"])[Object.keys(List["Units"]).length-1])+1;
             
         }
+        console.log("Passed",unit["Weapons"][unit["Default"]])
         var Total = 0
         for (const profkey of Object.keys(unit["Weapons"][unit["Default"]])){ 
             if (unit["Weapons"][unit["Default"]][profkey].hasOwnProperty("type") ){
@@ -281,22 +292,25 @@ export async function AddUnitToList(List : jsonDict<any>, unit : jsonDict<any>){
                 }
             }
         }
+        console.log(Total)
         var Weapons = []
         let i : number  =0
         for ( i=0; i < Total ;i++){
             Weapons.push(unit["Default"]);
         }
+        console.log("pushed weps")
         if (Object.keys(unit["Units"]).length > 0){
             Total+=Object.keys(unit["Units"]).length;
             for (const profkey of Object.keys(unit["Units"])){
                 Weapons.push(profkey);
             }
         }
-        List["Units"][Nextkey]  = {"size": Total, "ID":unit["ID"],"Weapons":Weapons,"Cost":unit["Cost"],"HasLeader":1}
+        List["Units"][Nextkey]  = {"size": Total, "ID":unit["ID"],"Weapons":Weapons,"Cost":unit["Cost"],"HasLeader":1,"Type":unit["Type"]}
         console.log(List["Units"][Nextkey]["ID"])
         console.log(unit)
     }
     
     SaveList(List);
+    console.log(List)
     return List;
 }

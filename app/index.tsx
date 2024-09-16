@@ -4,7 +4,7 @@ import { globalStyles } from "@/app/stylesheet";
 import *  as LayoutFunctions from "@/app/functions/LayoutFunctions";
 import {GetW40Index, ReadW40Index, DownloadAllIndex, GetAllUnitCosts, SelectUnitsfromType, PraseCat, GetUnitData, GetunitStats} from "@/app/functions/LoadData";
 import {CreateFactionList, AddUnitToList, RemoveUnitFromList, loadLists,DeleteList, DeleteListReload,RemoveModel, AddModel,NewestLists} from "@/app/functions/ListFunctions";
-
+import { useFocusEffect } from '@react-navigation/native';
 import { jsonDict } from "@/app/functions/Structs";
 import { Link, Stack } from "expo-router";
 import GenericUserIcon from "@/assets/images/icons/default-user.svg";
@@ -44,16 +44,38 @@ export async function Startup(){
   await DeleteList(list)*/
   let lists = await loadLists()
   console.log(lists)
+  console.log("Hi")
   return lists;
 }
-
+function GetdisplayLists(){
+  
+}
 export default function Index() {
   const [lists, setLists]  : any = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  useFocusEffect(() => {
+    async function fetchData() {
+      try{
+        const lists = await NewestLists();
+        console.log("rerendering!!")
+        console.log(lists)
+        setLists(lists);
+        setLoading(false);
+      }
+      catch(error){
+        setError(false);
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }); 
   useEffect(() => {
     async function fetchData() {
       try{
+        await GetW40Index();
+        await ReadW40Index();
+        await DownloadAllIndex("w40k_10e.json");
         const lists = await NewestLists();
         console.log("reutrn to me")
         console.log(lists)
@@ -69,9 +91,9 @@ export default function Index() {
   }, []);
   const headerHeight = useHeaderHeight() + 20;
   if (loading) {
-    return (<Text>Loading....</Text>)
+    return (<View><Text>Loading....</Text></View>)
   }else if (error){
-    return (<Text>NO WORK!!!!!</Text>)
+    return (<View><Text>NO WORK!!!!!</Text></View>)
   }else if (lists != null){
     return (
       <View
