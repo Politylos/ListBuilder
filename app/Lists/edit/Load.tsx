@@ -16,7 +16,7 @@ function GEtList(Listname : any){
                 
                 const Listin : any = await LoadList(Listname);
                 setList(Listin)
-                const UnitDataAllin :any = await GetAllUnitCosts(Listin["CatFile"])
+                const UnitDataAllin :any = await GetAllUnitCosts(Listin["CatFile"],true)
                 setUDA(UnitDataAllin)
                 setLoading(false);
             } catch(error){

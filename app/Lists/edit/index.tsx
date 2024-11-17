@@ -1,11 +1,17 @@
 import { Image, Text, ScrollView, View, Button, Pressable, StyleSheet } from 'react-native';
-import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
+import { useNavigation, useRouter, useLocalSearchParams, router } from "expo-router";
 import {AddModel, AddUnitToList, LoadList} from "@/app/functions/ListFunctions"
 import { useEffect, useState } from 'react';
 import { globalStyles } from "@/app/stylesheet";
 import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useHeaderHeight } from "@react-navigation/elements"
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons/faChevronDown';
+import { faPencil } from '@fortawesome/free-solid-svg-icons/faPencil';
+import { faAdd } from '@fortawesome/free-solid-svg-icons/faAdd';
+import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
+import { faPeopleGroup } from '@fortawesome/free-solid-svg-icons/faPeopleGroup'; // Change to ball pile
+import { faStar } from '@fortawesome/free-solid-svg-icons/faStar'; 
 import BottomSheet, {
   TouchableOpacity,
   TouchableHighlight,
@@ -19,6 +25,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GetAllUnitCosts, GetUnitData, GetunitStats, PraseCat } from '@/app/functions/LoadData';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 
 function GetRawData(Listname : any){
@@ -55,7 +62,10 @@ export default function Page() {
     const headerHeight = useHeaderHeight();
     const subHeadings = ["Epic Hero","Character","Battleline","Infantry","Mounted","Vehicle","Monster","Dedicated Transport","Swarm","Fortification"];    
     const params : any = useLocalSearchParams();
-    const UnitCostdata : any = JSON.parse(params["AllUnitData"]);
+    const UnitCostdataAll : any = JSON.parse(params["AllUnitData"]);
+    const UnitdataID : any = UnitCostdataAll["ID"];
+    const UnitCostdata : any = UnitCostdataAll["Name"];
+    console.log(UnitCostdata);
     const [keyRender,setkeyState] : any = useState(params["List"]);
     const [ListData, SetListData] : any = useState(JSON.parse(params["List"]))
     //const [RawData, SetRawData] : any = useState({});
@@ -88,7 +98,7 @@ export default function Page() {
                                 <View style={[styles.frameContainer, styles.frameParentFlexBox]}>
                                     <View style={styles.pointsParent}>
                                         <View style={styles.pencilShadowBox}>
-                                            <Text style={[styles.pencil, styles.pencilTypo]}>pencil</Text>
+                                            <FontAwesomeIcon icon={faPencil} style={[styles.pencil, styles.pencilTypo]} />
                                         </View>
                                         <View>
                                             <Text style={[styles.unitCard1, styles.pencilTypo]}>{data["Name"]}</Text>
@@ -96,11 +106,11 @@ export default function Page() {
                                     </View>
                                     <View style={styles.pointsParent}>
                                         <View style={styles.ballPileParent}>
-                                            <Text style={styles.ballPile}>ball-pile</Text>
+                                            <FontAwesomeIcon icon={faPeopleGroup} style={styles.ballPile} />
                                             <Text style={[styles.points, styles.pointsTypo]}>{data["Size"]}</Text>
                                         </View>
                                         <View style={styles.ballPileParent}>
-                                            <Text style={styles.ballPile}>star</Text>
+                                            <FontAwesomeIcon icon={faStar} style={styles.ballPile} />
                                             <Text style={[styles.points, styles.pointsTypo]}>{data["Cost"]}</Text>
                                         </View>
                                     </View>
@@ -108,7 +118,7 @@ export default function Page() {
                                 <View style={styles.modelCard}>
                                     <View style={[styles.frameParent2, styles.frameParentFlexBox]}>
                                         <View style={styles.plusParent}>
-                                            <Text style={styles.ballPile}>plus</Text>
+                                            <FontAwesomeIcon icon={faPlus} style={styles.ballPile} />
                                             <Text style={styles.modelCard1}>Model Card</Text>
                                         </View>
                                         <View style={styles.swordParent}>
@@ -128,12 +138,12 @@ export default function Page() {
                         <View style={[styles.charactersParent, styles.frameParentFlexBox]}>
                             <Text style={[styles.detachment1, styles.pointsTypo]}>{Name}</Text>
                             <View style={[styles.chevronDownWrapper, styles.plusParent4FlexBox]}>
-                                <Text style={styles.chevronDown}>chevron-down</Text>
+                                <FontAwesomeIcon icon={faChevronDown} />
                             </View>
                         </View>
                         {
                             Object.keys(ListData["Units"]).map((unit:any) => {
-                                return RenderUnitCards(ListData["Units"][unit],Name);
+                                return RenderUnitCards(ListData["Units"][unit],Name,unit);
                             }, [])
                         }
                         {modalbtn(handleSnapPress,Name)}
@@ -145,7 +155,7 @@ export default function Page() {
                     <View style={[styles.charactersParent, styles.frameParentFlexBox]}>
                         <Text style={[styles.detachment1, styles.pointsTypo]}>{Name}</Text>
                         <View style={[styles.chevronDownWrapper, styles.plusParent4FlexBox]}>
-                            <Text style={styles.chevronDown}>chevron-down</Text>
+                            <FontAwesomeIcon icon={faChevronDown} />
                         </View>
                     </View>
                     {modalbtn(handleSnapPress,Name)}
@@ -153,34 +163,33 @@ export default function Page() {
         );
     }
 
-    function RenderUnitCards(data : any, type : string){
+    function RenderUnitCards(data : any, type : string, unitindex : number){
         if (data["Type"] == type){
-            return (<View style={[styles.unitCard, styles.cardLayout]}>
-                                
-                <View style={[styles.frameContainer, styles.frameParentFlexBox]}>
+            return (<View style={[styles.unitCard, styles.cardLayout]}>          
+                <TouchableOpacity style={[styles.frameContainer, styles.frameParentFlexBox]} onPress={()=>{router.navigate({ pathname: "/Lists/edit/Unit", params: {"UnitIndex":unitindex,"UnitCostdataAll":JSON.stringify(UnitCostdataAll),"unit": JSON.stringify(data), "List":JSON.stringify(ListData) } })}}>
                     <View style={styles.pointsParent}>
                         <View style={styles.pencilShadowBox}>
-                            <Text style={[styles.pencil, styles.pencilTypo]}>pencil</Text>
+                            <FontAwesomeIcon icon={faPencil} style={[styles.pencil, styles.pencilTypo]} />
                         </View>
                         <View>
-                            <Text style={[styles.unitCard1, styles.pencilTypo]}>{data["ID"]}</Text>
+                            <Text style={[styles.unitCard1, styles.pencilTypo]}>{UnitdataID[data["ID"]]}</Text>
                         </View>
                     </View>
                     <View style={styles.pointsParent}>
                         <View style={styles.ballPileParent}>
-                            <Text style={styles.ballPile}>ball-pile</Text>
+                            <FontAwesomeIcon icon={faPeopleGroup} style={styles.ballPile} />
                             <Text style={[styles.points, styles.pointsTypo]}>{data["size"]}</Text>
                         </View>
                         <View style={styles.ballPileParent}>
-                            <Text style={styles.ballPile}>star</Text>
+                            <FontAwesomeIcon icon={faStar} style={styles.ballPile} />
                             <Text style={[styles.points, styles.pointsTypo]}>{data["Cost"]}</Text>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.modelCard}>
                     <View style={[styles.frameParent2, styles.frameParentFlexBox]}>
                         <View style={styles.plusParent}>
-                            <Text style={styles.ballPile}>plus</Text>
+                            <FontAwesomeIcon icon={faPlus} style={styles.ballPile} />
                             <Text style={styles.modelCard1}>Model Card</Text>
                         </View>
                         <View style={styles.swordParent}>
@@ -218,9 +227,9 @@ export default function Page() {
         //Name of model
         //var unitData = await GetUnitData(ModelName,RawData);
         var dataunit = await GetunitStats(ModelName,RawData["RawData"]);
-        console.log(dataunit);
+        console.log("unit stats",dataunit);
         SetListData(await AddUnitToList(ListData,dataunit));
-        console.log(ListData);
+        console.log("new list",ListData);
 
         
     }
@@ -229,13 +238,14 @@ export default function Page() {
         return (
             <TouchableOpacity style={[styles.emptyCard, styles.cardLayout]} onPress={() => handleSnapPress(0,Name)}>
         <View style={[styles.plusParent4, styles.plusParent4FlexBox]}>
-            <Text style={styles.plus6}>plus</Text>
+            <FontAwesomeIcon icon={faPlus} style={styles.plus6} />
             <Text style={[styles.points, styles.pointsTypo]}>Add a unit</Text>
         </View>
         </TouchableOpacity>);
         
     }
     function AddNewUnitCard(data : any, type : string,RawData : any){
+        console.log(data)
         return (
             <View style={styles.modelCard}>
             <View style={[styles.frameParent, StyleAddUnit.unitCardSpaceBlock]}>
@@ -243,17 +253,17 @@ export default function Page() {
             <Text style={[StyleAddUnit.unitName, StyleAddUnit.addFlexBox]}>{data["Name"]}</Text>
             <View style={[styles.frameGroup, styles.frameParentFlexBox]}>
             <View style={[styles.ballPileParent, styles.frameParentFlexBox]}>
-            <Text style={[styles.ballPile, StyleAddUnit.textTypo]}>ball-pile</Text>
+            <FontAwesomeIcon icon={faPeopleGroup} style={[styles.ballPile, StyleAddUnit.textTypo]} />
             <Text style={[StyleAddUnit.text, StyleAddUnit.textTypo]}>{data["Size"]}</Text>
             </View>
             <View style={[styles.ballPileParent, styles.frameParentFlexBox]}>
-            <Text style={[styles.ballPile, StyleAddUnit.textTypo]}>star</Text>
+            <FontAwesomeIcon icon={faStar} style={[styles.ballPile, StyleAddUnit.textTypo]} />
             <Text style={[StyleAddUnit.text, StyleAddUnit.textTypo]}>{data["Cost"]}</Text>
             </View>
             </View>
             </View>
             <TouchableOpacity style={StyleAddUnit.back} onPress={()=>AddNewmodel(data["Name"],RawData)}>
-            <Text style={[StyleAddUnit.add, StyleAddUnit.addFlexBox]}>add</Text>
+            <FontAwesomeIcon icon={faAdd} style={[StyleAddUnit.add, StyleAddUnit.addFlexBox]} />
             </TouchableOpacity>
             </View>
             <View style={[styles.unitCard, StyleAddUnit.unitCardSpaceBlock]}>

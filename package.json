@@ -34,6 +34,7 @@
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
     "install": "^0.13.0",
+    "listbuilder": "file:",
     "npm": "^10.8.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",

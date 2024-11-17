@@ -146,6 +146,15 @@ function MoveThroughXML(element : any){
   }
   return struct;
 }
+export async function ExplodeWepons(data : any){
+  if (data["Weapons"] != null){
+    for (const wep of Object.keys(data["Weapons"])){
+      if (data["Weapons"][wep].hasOwnProperty("defaultSelectionEntryId")){
+        
+      }
+    }
+  }
+}
 export async  function PraseCat(file : string){
   const fileUri = GetFileUri(file);
   const FileData = await FileSystem.readAsStringAsync(fileUri);
@@ -211,7 +220,6 @@ export async function MoveOverUnit(data: any, store: any){
 }
 
 export async function GetUnitData(name: string, data: any){
-  
   var units_xml = await FindTag(data, "sharedSelectionEntries");
   for (const child_ele of Object.keys(units_xml.childNodes)){
     if (units_xml.childNodes[child_ele].hasOwnProperty("attributes")){
@@ -239,6 +247,7 @@ export async function GetUnits(data: any){
   for (const child_ele of Object.keys(units_xml.childNodes)){
     if (units_xml.childNodes[child_ele].hasOwnProperty("attributes")){
       var elementData : jsonDict<any> = {}
+      console.log(units_xml.childNodes[child_ele].attributes);
       for (const att of Object.keys(units_xml.childNodes[child_ele].attributes)){
         if ((units_xml.childNodes[child_ele].attributes[att].hasOwnProperty("name")) & (units_xml.childNodes[child_ele].attributes[att].hasOwnProperty("nodeValue"))){
           elementData[units_xml.childNodes[child_ele].attributes[att]["name"]]=units_xml.childNodes[child_ele].attributes[att]["nodeValue"];
@@ -389,10 +398,11 @@ export async function GetUnitProf(data : any){
   return await GetUnitSection(data, "profiles")
 }
 
-export async function GetAllUnitCosts(catFile : string){
+export async function GetAllUnitCosts(catFile : string, IDDict : boolean = false){
   var Filedata = await PraseCat(catFile);
   var AllUnits : jsonDict<any> = await GetUnits(Filedata);
   var JsdonUnits : jsonDict<any> = {}
+  var JsdonUnitsID : jsonDict<any> = {}
   for (const ID of Object.keys(AllUnits)){
     
     if (AllUnits[ID]["hidden"] == 'false'){
@@ -407,17 +417,19 @@ export async function GetAllUnitCosts(catFile : string){
           //console.log(unitcost);
           if (unitcost != null){
             if (unitmod != null){
-            JsdonUnits[AllUnits[ID]["name"]] = {"ID":AllUnits[ID]["id"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":unitmod[0]["value"], "Type": "None"};
+            JsdonUnits[AllUnits[ID]["name"]] = {"Name":AllUnits[ID]["name"], "ID":AllUnits[ID]["targetId"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":unitmod[0]["value"], "Type": "None"};
+            
             } else{
-              JsdonUnits[AllUnits[ID]["name"]] = {"Name":AllUnits[ID]["name"],"ID":AllUnits[ID]["id"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":'1',"Type":"None"};
+              JsdonUnits[AllUnits[ID]["name"]] = {"Name":AllUnits[ID]["name"],"ID":AllUnits[ID]["targetId"], "Cost": unitcost[IDict["Cost"]]["value"], "Size":'1',"Type":"None"};
             }
+            JsdonUnitsID[AllUnits[ID]["targetId"]] = AllUnits[ID]["name"];
             if (unitCats != null){
               var toptype = false;
               for (const Catkey of Object.keys(unitCats)){
                 if (!toptype){
                   if ((unitCats[Catkey]["name"] == "Vehicle") || (unitCats[Catkey]["name"] == "Battleline") || (unitCats[Catkey]["name"] == "Infantry") || (unitCats[Catkey]["name"] == "Mounted") || (unitCats[Catkey]["name"] == "Fortification") || (unitCats[Catkey]["name"] == "Monster") || (unitCats[Catkey]["name"] == "Swarm") || (unitCats[Catkey]["name"] == "Character") || (unitCats[Catkey]["name"] == "Epic Hero") || (unitCats[Catkey]["name"] == "Dedicated Transport")){
                     JsdonUnits[AllUnits[ID]["name"]]["Type"] = unitCats[Catkey]["name"]
-                    if ((unitCats[Catkey]["name"] == "Battleline") || (unitCats[Catkey]["name"] == "Epic Hero")){
+                    if ((unitCats[Catkey]["name"] == "Battleline") || (unitCats[Catkey]["name"] == "Epic Hero") || (unitCats[Catkey]["name"] == "Character")){
                       toptype = true;
                     }
                   }
@@ -432,13 +444,18 @@ export async function GetAllUnitCosts(catFile : string){
       }
     } 
   } 
+  if (IDDict){
+    return {"Name" : JsdonUnits, "ID": JsdonUnitsID};
+  }
   return JsdonUnits;
   //await GetUnitcosts(data);
 }
 export async function GetunitStats(unit : string, data : any){
-  console.log(unit, data)
+  console.log("passed data",unit, data)
   var unitData = await GetUnitData(unit,data);
+  console.log("unitdata!!",unitData);
   var unitCats : jsonDict<any> = await GetUnitcat(unitData);
+  console.log("unitcats!!", unitCats)
   let mainID = null;
   if (unitData != null){
     if (unitData != null){
@@ -448,6 +465,7 @@ export async function GetunitStats(unit : string, data : any){
             if (unitData.attributes[unitkey].hasOwnProperty("nodeName")){
               if (unitData.attributes[unitkey]["nodeName"] == "id"){
                 mainID = unitData.attributes[unitkey]["nodeValue"];
+                console.log("MAINID",mainID)
               }
             }
           }
@@ -457,7 +475,8 @@ export async function GetunitStats(unit : string, data : any){
     var unitProf =  await GetUnitProf(unitData);
     var unitsectionGroups =  await GetUnitsectionGroups(unitData);
     var unitentriers=  await GetUnitsectionEntries(unitData);
-    var unitjson :  jsonDict<any> = {"ID":mainID,"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0, "Type":null};
+    console.log("more data", unitProf, unitsectionGroups, unitentriers)
+    var unitjson :  jsonDict<any> = {"ID":mainID,"Stats": null,"Invul":null,"Abilities":[], "Units":null,"Weapons":null,"Default":null,"Cost":0, "Type":null, "defualtSize":1};
     var unitcost : jsonDict<any> = await GetUnitcosts(unitData);
     if (unitCats != null){
       if (Object.keys(unitCats).length > 0){
@@ -475,6 +494,10 @@ export async function GetunitStats(unit : string, data : any){
         unitjson["Type"]
       }
       
+    }
+    var unitmod : jsonDict<any> = await GetUnitMods(unitData);
+    if (unitmod != null){
+      unitjson["defualtSize"] = unitmod[0]["value"]
     }
     if (unitcost != null){
       unitjson["Cost"] = parseInt(unitcost[IDict["Cost"]]["value"]);
@@ -498,6 +521,7 @@ export async function GetunitStats(unit : string, data : any){
         }
       }
     }
+    console.log("json before wep",unitjson)
     if (unitsectionGroups != null){
       unitjson["Weapons"] = {}
       if (Object.keys(unitsectionGroups).length == 1){
@@ -515,6 +539,20 @@ export async function GetunitStats(unit : string, data : any){
       }
 
     }
+    console.log("json after wep",unitjson,unitjson["Default"],unitjson["Default"] == null)
+    if ((unitjson["Default"] == null) && (unitjson["Weapons"] != null)){
+      console.log(unitjson["Weapons"])
+      for (const sectionkey of Object.keys(unitjson["Weapons"])){
+        
+        if (unitjson["Weapons"][sectionkey].hasOwnProperty("name")){
+          console.log(unitjson["Weapons"][sectionkey]["name"],unit, unitjson["Weapons"][sectionkey]["name"]==unit)
+          if ((unitjson["Weapons"][sectionkey]["name"] == unit) || (unit.slice(0, -1) == unitjson["Weapons"][sectionkey]["name"])){
+            unitjson["Default"] = sectionkey;
+          }
+        }
+      }
+    }
+    console.log("bee bop")
     if (unitentriers != null){
       unitjson["Units"] = unitentriers;
     }

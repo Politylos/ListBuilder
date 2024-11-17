@@ -183,13 +183,14 @@ export async function AddModel(List : jsonDict<any>, key: number, NewWeapon : st
                                 }
                             }
                         }
-                        for (const currentweps of List["Units"][key]["Weapons"]){
-                            if (currentweps == NewWeapon){
+                        console.log("new to add",totalamountofNew);
+                        for (const currentweps of Object.keys(List["Units"][key]["Weapons"])){
+                            if (List["Units"][key]["Weapons"][currentweps] == NewWeapon){
                                 countusing++;
                             }
                         }
                         console.log(countusing)
-                        console.log(totalamountofNew)
+                        console.log("Yay made it",totalamountofNew)
                         if ((countusing < totalamountofNew)  && ((maxunits +List["Units"][key]["HasLeader"]) >= List["Units"][key]["size"]) && (((maxunits +List["Units"][key]["HasLeader"]) > List["Units"][key]["size"]) || (NewWeapon != stats["Default"])) ){
                             if ((NewWeapon != stats["Default"]) && (maxunits <= List["Units"][key]["size"])){
                                 console.log(maxunits + minunits)
@@ -203,7 +204,12 @@ export async function AddModel(List : jsonDict<any>, key: number, NewWeapon : st
                                 List["Cost"]+= List["Units"][key]["Cost"] 
                             }
                             List["Units"][key]["size"]++;
-                            List["Units"][key]["Weapons"].push(NewWeapon);
+                            if (List["Units"][key]["Weapons"].hasOwnProperty(NewWeapon)){
+                                List["Units"][key]["Weapons"][NewWeapon]++;
+                            }else {
+                                List["Units"][key]["Weapons"][NewWeapon]=1;
+                            }
+                            
                         }
                     }
                 }
@@ -249,12 +255,13 @@ export async function RemoveModel(List : jsonDict<any>, key: number, RemoveWeapo
                         List["Units"][key]["Cost"] = stats["Cost"]*NewGroupsize;
                         List["Cost"]+= List["Units"][key]["Cost"]
                         List["Units"][key]["size"]--;
-                        for (let i=0; i < List["Units"][key]["Weapons"].length; i++) {
-                            if (List["Units"][key]["Weapons"][i] == RemoveWeapon){
-                                List["Units"][key]["Weapons"].splice(i, 1);  
-                                break;
+                        if (List["Units"][key]["Weapons"].hasOwnProperty(RemoveWeapon)){
+                            if (List["Units"][key]["Weapons"][RemoveWeapon] > 1){
+                                List["Units"][key]["Weapons"][RemoveWeapon]--;
+                            } else {
+                                delete List["Units"][key]["Weapons"][RemoveWeapon];
                             }
-                        } 
+                        }
                         if ((RemoveWeapon != stats["Default"]) && (minunits+List["Units"][key]["HasLeader"] >= List["Units"][key]["size"])){
                             List = await AddModel(List,key, stats["Default"],stats);
                         }                       
@@ -272,7 +279,7 @@ export async function ChangeWeapon(List : jsonDict<any>, key: number, NewWeapon 
 }
 
 export async function AddUnitToList(List : jsonDict<any>, unit : jsonDict<any>){
-    
+    console.log("unit dat:",unit)
     if ((List.hasOwnProperty("Units")) && (List.hasOwnProperty("Cost"))){
         
         List["Cost"] += parseInt(unit["Cost"]);
@@ -283,27 +290,63 @@ export async function AddUnitToList(List : jsonDict<any>, unit : jsonDict<any>){
             Nextkey = parseInt(Object.keys(List["Units"])[Object.keys(List["Units"]).length-1])+1;
             
         }
-        console.log("Passed",unit["Weapons"][unit["Default"]])
+
         var Total = 0
+        /*
         for (const profkey of Object.keys(unit["Weapons"][unit["Default"]])){ 
             if (unit["Weapons"][unit["Default"]][profkey].hasOwnProperty("type") ){
-                if (unit["Weapons"][unit["Default"]][profkey]["type"] == "max"){
+                if (unit["Weapons"][unit["Default"]][profkey]["type"] == "min"){
                     Total = parseInt(unit["Weapons"][unit["Default"]][profkey]["value"]);
                 }
             }
         }
-        console.log(Total)
-        var Weapons = []
-        let i : number  =0
-        for ( i=0; i < Total ;i++){
-            Weapons.push(unit["Default"]);
-        }
-        console.log("pushed weps")
-        if (Object.keys(unit["Units"]).length > 0){
-            Total+=Object.keys(unit["Units"]).length;
-            for (const profkey of Object.keys(unit["Units"])){
-                Weapons.push(profkey);
+        */
+    var Weapons : any = {}
+    console.log("this i sthe defualt for unit",unit["Default"],unit,unit.hasOwnProperty("Default"));
+        if (unit.hasOwnProperty("Default")){
+            if (unit["Weapons"] != null){
+                if (unit["Default"] != null){
+                for (const profkey of Object.keys(unit["Weapons"])){ 
+                    if (unit["Weapons"][profkey].hasOwnProperty("type") ){
+                        if (unit["Weapons"][profkey]["type"] == "min"){
+                            Total = parseInt(unit["Weapons"][profkey]["value"]);
+                        }
+                    }
+                }
+                console.log(Total)
+                Weapons[unit["Default"]] = Total;
             }
+            else {
+                for (const profkey of Object.keys(unit["Weapons"])){ 
+                    if (unit["Weapons"][profkey].hasOwnProperty("Default") || unit["Weapons"][profkey].hasOwnProperty("defaultSelectionEntryId")){
+                        console.log("got wep",unit["Weapons"][profkey])
+                        for (const profkey2 of Object.keys(unit["Weapons"][profkey])){
+                            if (unit["Weapons"][profkey][profkey2].hasOwnProperty("type") ){
+                                if (unit["Weapons"][profkey][profkey2]["type"] == "min"){
+                                    Weapons[unit["Weapons"][profkey]["defaultSelectionEntryId"]] = unit["Weapons"][profkey][profkey2]["value"];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            }
+        } 
+        console.log("pushed weps",unit["Units"])
+        if ((unit["Units"] != undefined) && (unit["Units"] != null)){
+            if (Object.keys(unit["Units"]).length > 0){
+                Total+=Object.keys(unit["Units"]).length;
+                for (const profkey of Object.keys(unit["Units"])){
+                    if (Weapons.hasOwnProperty(profkey)){
+                        Weapons[profkey]+=1
+                    }else{
+                        Weapons[profkey]=1
+                    }
+                }
+            }
+        }
+        if ((unit["Type"]  != "Battleline") && (unit["Type"]  != "Infantry") || (unit["defualtSize"] > 1)){
+            Total = parseInt(unit["defualtSize"]);
         }
         List["Units"][Nextkey]  = {"size": Total, "ID":unit["ID"],"Weapons":Weapons,"Cost":unit["Cost"],"HasLeader":1,"Type":unit["Type"]}
         console.log(List["Units"][Nextkey]["ID"])
