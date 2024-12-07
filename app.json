@@ -27,7 +27,30 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      [
+        "expo-font", {
+          "fonts": [
+            "./assets/fonts/HankenGrotesk-Black.ttf",
+            "./assets/fonts/HankenGrotesk-BlackItalic.ttf",
+            "./assets/fonts/HankenGrotesk-Bold.ttf",
+            "./assets/fonts/HankenGrotesk-BoldItalic.ttf",
+            "./assets/fonts/HankenGrotesk-ExtraBold.ttf",
+            "./assets/fonts/HankenGrotesk-ExtraBoldItalic.ttf",
+            "./assets/fonts/HankenGrotesk-ExtraLight.ttf",
+            "./assets/fonts/HankenGrotesk-ExtraLightItalic.ttf",
+            "./assets/fonts/HankenGrotesk-Italic.ttf",
+            "./assets/fonts/HankenGrotesk-Light.ttf",
+            "./assets/fonts/HankenGrotesk-LightItalic.ttf",
+            "./assets/fonts/HankenGrotesk-Medium.ttf",
+            "./assets/fonts/HankenGrotesk-MediumItalic.ttf",
+            "./assets/fonts/HankenGrotesk-Regular.ttf",
+            "./assets/fonts/HankenGrotesk-SemiBold.ttf",
+            "./assets/fonts/HankenGrotesk-SemiBoldItalic.ttf",
+            "./assets/fonts/HankenGrotesk-Thin.ttf",
+            "./assets/fonts/HankenGrotesk-ThinItalic.ttf"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

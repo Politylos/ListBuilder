@@ -16,7 +16,11 @@ export function RenderListcard (name : string, Cost: any, Faction: string){
             <Pressable style={globalStyles.dashboardCardList}>
                 <View style={globalStyles.dashboardCardListFirstLine}>
                 <Text style={globalStyles.dashboardCardListName}>{name}</Text>
-                <Text style={globalStyles.dashboardCardListPoints}>{Cost}</Text>
+                <Text style={globalStyles.dashboardCardListPoints}>{Cost}
+                    {
+                        Cost == 1? <Text> point</Text> : <Text> points</Text>
+                    }
+                </Text>
                 </View>
                 <View style={globalStyles.dashboardCardListSecondLine}>
                 <View style={globalStyles.dashboardCardListFaction}>

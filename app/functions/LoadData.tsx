@@ -40,7 +40,7 @@ export async function DownloadIndex(fileName: string,url: string) {
 }
 
 export async function GetW40Index(){
-  return DownloadIndex("w40k_10e.json","http://10.0.0.144:4444/wh40k_feed")
+  return DownloadIndex("w40k_10e.json","http://michael.local:61265/wh40k_feed")
 }
 
 export async function ReadSystemData(file : string){

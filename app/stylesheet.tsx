@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
+import {StyleSheet, Text, View} from "react-native";
+import { useFonts } from "expo-font";
+
+
 
 export const globalStyles = StyleSheet.create({
 	TextInput: {
-			height: 40,
-			margin: 12,
-			borderWidth: 1,
-			padding: 10,
+		height: 40,
+		margin: 12,
+		borderWidth: 1,
+		padding: 10,
 	},
 	rootEmptyCard: {
 		height: 81,
@@ -25,28 +28,30 @@ export const globalStyles = StyleSheet.create({
 		borderWidth: 2,
 		borderStyle: 'dashed',
 		borderColor: 'Placeholder.Grey',
-	  },
-	  plusEmptyCard: {
+	},
+	plusEmptyCard: {
 		color: 'rgba(0, 0, 0, 1)',
 		textAlign: 'center',
+		fontFamily: 'HankenGrotesk-Regular',
 		fontSize: 14,
 		fontStyle: 'normal',
 		fontWeight: '900',
-	  },
-	  addAUnitEmptyCard: {
+	},
+	addAUnitEmptyCard: {
 		color: 'rgba(0, 0, 0, 1)',
 		textAlign: 'center',
 		fontSize: 14,
+		fontFamily: 'HankenGrotesk-Regular',
 		fontStyle: 'normal',
 		fontWeight: '700',
-	  },
-	  frame42EmptyCard: {
+	},
+	frame42EmptyCard: {
 		flexDirection: 'column',
 		justifyContent: 'flex-end',
 		alignItems: 'center',
 		rowGap: 5,
 		columnGap: 5,
-	  },
+	},
 	dashboardScrollViewParent: {
 		width: '100%',
 		paddingHorizontal: 20
@@ -62,14 +67,15 @@ export const globalStyles = StyleSheet.create({
 		// backgroundColor: 'green'
 	},
 	scrollViewSectionTitleHeading: {
+		fontFamily: 'HankenGrotesk-Bold',
 		fontSize: 24,
-		fontWeight: '700'
+		fontWeight: '700',
+		letterSpacing: -0.2
 	},
 	scrollViewSectionTitleButton: {
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		backgroundColor: 'grey',
-		fontWeight: '700',
 		borderRadius: 5,
 		borderCurve: 'continuous'
 	},
@@ -77,12 +83,12 @@ export const globalStyles = StyleSheet.create({
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		backgroundColor: 'grey',
-		fontWeight: '700',
 		borderRadius: 5,
 		borderCurve: 'continuous',
 		opacity: 0.5
 	},
 	scrollViewSectionTitleButtonText: {
+		fontFamily: 'HankenGrotesk-Bold',
 		color: 'white'
 	},
 	dashboardGameCarousel: {
@@ -102,9 +108,28 @@ export const globalStyles = StyleSheet.create({
 		padding: 15
 	},
 	dashboardCardList: {
-		backgroundColor: 'grey',
+		backgroundColor: 'rgba(238, 248, 245, 1)',
 		borderRadius: 10,
 		borderCurve: 'continuous',
 		padding: 15,
+		display: 'flex',
+		flexDirection: 'column',
+		gap: 5
+	},
+	dashboardCardListFirstLine: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center'
+	},
+	dashboardCardListName: {
+		fontSize: 18,
+		fontFamily: 'HankenGrotesk-Bold'
+	},
+	dashboardCardListFactionName: {
+		fontSize: 14
+	},
+	dashboardCardListPoints: {
+		fontSize: 14
 	}
 });

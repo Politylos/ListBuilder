@@ -1,4 +1,5 @@
 import { Image, Text, View, ScrollView, Button, Pressable } from "react-native";
+import * as SplashScreen from 'expo-splash-screen';
 import { useState, useEffect } from 'react';
 import { globalStyles } from "@/app/stylesheet";
 import *  as LayoutFunctions from "@/app/functions/LayoutFunctions";
@@ -7,12 +8,15 @@ import {CreateFactionList, AddUnitToList, RemoveUnitFromList, loadLists,DeleteLi
 import { useFocusEffect } from '@react-navigation/native';
 import { jsonDict } from "@/app/functions/Structs";
 import { Link, Stack } from "expo-router";
+import LBLogoIcon from "@/assets/images/icons/lb-logo.svg";
 import GenericUserIcon from "@/assets/images/icons/default-user.svg";
 import CogIcon from "@/assets/images/icons/cog.svg";
 import ChevronRightIcon from "@/assets/images/icons/chevron-right.svg";
 import DiceIcon from "@/assets/images/icons/dice.svg";
 import ClipboardIcon from "@/assets/images/icons/clipboard-list.svg";
 import { useHeaderHeight } from "@react-navigation/elements"
+
+SplashScreen.preventAutoHideAsync();
 
 export async function Startup(){
   /*await GetW40Index();
@@ -43,23 +47,25 @@ export async function Startup(){
   console.log("bdddddsdsdsddidwwwdtch")
   await DeleteList(list)*/
   let lists = await loadLists()
-  console.log(lists)
+  // console.log(lists)
   console.log("Hi")
   return lists;
 }
 function GetdisplayLists(){
   
 }
+
 export default function Index() {
   const [lists, setLists]  : any = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
   useFocusEffect(() => {
     async function fetchData() {
       try{
         const lists = await NewestLists();
         console.log("rerendering!!")
-        console.log(lists)
+        // console.log(lists)
         setLists(lists);
         setLoading(false);
       }
@@ -78,7 +84,7 @@ export default function Index() {
         await DownloadAllIndex("w40k_10e.json");
         const lists = await NewestLists();
         console.log("reutrn to me")
-        console.log(lists)
+        // console.log(lists)
         setLists(lists);
         setLoading(false);
       }
@@ -95,6 +101,7 @@ export default function Index() {
   }else if (error){
     return (<View><Text>NO WORK!!!!!</Text></View>)
   }else if (lists != null){
+    SplashScreen.hideAsync();
     return (
       <View
         style={{
@@ -109,7 +116,7 @@ export default function Index() {
           headerTitle: () => (
             <View style={{ flex: 1, flexDirection: "row", }}>
               <Text style={{ fontSize: 20, fontWeight: 300 }}>
-                ListBuilder
+                <LBLogoIcon width={38} height={42} />
               </Text>
             </View>
           ),
@@ -197,7 +204,7 @@ export default function Index() {
           headerTitle: () => (
             <View style={{ flex: 1, flexDirection: "row", }}>
               <Text style={{ fontSize: 20, fontWeight: 300 }}>
-                ListBuilder
+                <LBLogoIcon width={38} height={42} />
               </Text>
             </View>
           ),
